@@ -1,15 +1,6 @@
-// Copyright 2017, Google, Inc.
-// Licensed under the Apache License, Version 2.0 (the 'License');
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an 'AS IS' BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/* 
+ * Frarold Cloud Functions.
+ */
 
 'use strict';
 const https = require('https');
@@ -17,18 +8,12 @@ const frarold_host = 'https://aspc.pomona.edu/api/menu/';
 const frarold_dining_hall_path = 'dining_hall/';
 const frarold_day_path = 'day/';
 const frarold_meal_path = 'meal/';
-const frarold_auth_token = '447715aa4a6d9406e9b613f468bc6ccc9f02f20c';
+const frarold_auth_token_path = 
+    '?auth_token=447715aa4a6d9406e9b613f468bc6ccc9f02f20c';
 
-/**
- * HTTP Cloud Function.
- *
- * @param {Object} req Cloud Function request context.
- * @param {Object} res Cloud Function response context.
+/*
+ * Dialogflow Webhooks.
  */
-exports.helloHttp = function helloHttp (req, res) {
-  res.send(`Hello ${req.body.name || 'World'}!`);
-};
-
 exports.fraroldWebhook = (req, res) => {
 
     // Both dining_hall and meal are required parameters.
@@ -48,11 +33,20 @@ exports.fraroldWebhook = (req, res) => {
     });
 };
 
+/*
+ * Helper functions.
+ */
 function callASPCMenuService (dining_hall, meal) {
-
     return new Promise((resolve, reject) => {
+        let day = 'mon';
+        let path = frarold_host + frarold_dining_hall_path + dining_hall + '/' +
+            frarold_day_path + day + '/' + frarold_meal_path + meal + '/' +
+            frarold_auth_token_path;
+
+        console.log('callASPCMenuService: HTTP GET ' + path);
+
         https.get(
-            'https://aspc.pomona.edu/api/menu/dining_hall/frary/day/mon/meal/lunch?auth_token=447715aa4a6d9406e9b613f468bc6ccc9f02f20c',
+            path,
             (resp) => {
                 let data = '';
 
@@ -79,3 +73,8 @@ function callASPCMenuService (dining_hall, meal) {
             });
   });
 }
+
+function getToday (datetime) {
+
+}
+
