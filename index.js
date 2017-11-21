@@ -12,15 +12,22 @@
 // limitations under the License.
 
 'use strict';
-const http = require('http');
-const host = 'api.worldweatheronline.com';
-const wwoApiKey = '[YOUR_API_KEY]';
-
+const https = require('https');
 const frarold_host = 'https://aspc.pomona.edu/api/menu/';
 const frarold_dining_hall_path = 'dining_hall/';
 const frarold_day_path = 'day/';
 const frarold_meal_path = 'meal/';
 const frarold_auth_token = '447715aa4a6d9406e9b613f468bc6ccc9f02f20c';
+
+/**
+ * HTTP Cloud Function.
+ *
+ * @param {Object} req Cloud Function request context.
+ * @param {Object} res Cloud Function response context.
+ */
+exports.helloHttp = function helloHttp (req, res) {
+  res.send(`Hello ${req.body.name || 'World'}!`);
+};
 
 exports.fraroldWebhook = (req, res) => {
 
@@ -33,7 +40,7 @@ exports.fraroldWebhook = (req, res) => {
     callASPCMenuService(dining_hall, meal).then((output) => {
         // Return the results of the ASPC Menu API to Dialogflow.
         res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify({ 'speech': output, 'displayText': output }));
+        res.send(JSON.stringify({'speech': output, 'displayText': output}));
     }).catch((error) => {
         // Let the user know if there is an error.
         res.setHeader('Content-Type', 'application/json');
@@ -42,31 +49,33 @@ exports.fraroldWebhook = (req, res) => {
 };
 
 function callASPCMenuService (dining_hall, meal) {
+
     return new Promise((resolve, reject) => {
-    // Create the path for the HTTP request to get ASPC Menu data.
-    let path = frarold_dining_hall_path + dining_hall + '/' +
-      frarold_day_path + 'mon' + '/' + frarold_meal_path + meal + '?' +
-      'auth_token=' + frarold_auth_token;
+        https.get(
+            'https://aspc.pomona.edu/api/menu/dining_hall/frary/day/mon/meal/lunch?auth_token=447715aa4a6d9406e9b613f468bc6ccc9f02f20c',
+            (resp) => {
+                let data = '';
 
-    console.log("API GET URI: " + host + path);
+                resp.on('data', (chunk) => {
+                    data += chunk;
+                });
 
-    // Make the HTTP request to get the weather
-    http.get({host: frarold_host, path: path}, (res) => {
-      let body = ''; // var to store the response chunks
-      res.on('data', (d) => { body += d; }); // store each response chunk
-      res.on('end', () => {
-        // After all the data has been received parse the JSON for desired data
-        let response = JSON.parse(body);
+                resp.on('end', () => {
+                    let result = JSON.parse(data)[0];
+                    let food_items = result.food_items;
 
-        // Create response
-        let output = `You asked for ${meal} at ${dining_hall}.`;
-        // Resolve the promise with the output text
-        console.log(output);
-        resolve(output);
-      });
-      res.on('error', (error) => {
-        reject(error);
-      });
-    });
+                    let output = '';
+                    for (var i in food_items) {
+                        let item = food_items[i];
+                        output += item;
+                    }
+                    resolve(output);
+
+                });
+
+            }).on("error", (err) => {
+                console.log("Error: " + err.message);
+                reject(error);
+            });
   });
 }
