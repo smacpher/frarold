@@ -5,7 +5,7 @@ Ask me about food at the 5C's.
 So far, you can only talk to me through the command line.
 
 To do this, open Terminal and use the following command:
-`python frarold/python\_client.py`
+`python frarold/python_client.py`
 
 ## Dependencies
 To use the Python CLI Client, you will need to install the
