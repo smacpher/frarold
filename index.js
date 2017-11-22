@@ -87,13 +87,16 @@ function callASPCMenuService (diningHall, dateObj, meal) {
                 let foodItems = result.food_items;
                 let output = '';
                 output += prettifyDiningHallEntityName(diningHall) + ' has ';
+
                 for (var i in foodItems) {
                     let item = foodItems[i];
-                    if (i != foodItems.length - 1) {
+                    if (i < foodItems.length - 1) {
                         output += item + ', ';
+                    } else {
+                        output += 'and ' + item + ' ';
                     }
                 }
-                output += 'for ' + meal + '.'
+                output += 'for ' + meal + ' ' + outputDay + '.';
                 console.log('callASPCMenuService: output: ' + output);
 
                 // Resolve promise.
@@ -147,3 +150,5 @@ function prettifyDiningHallEntityName(string) {
     ]);
     return diningHallNameMap.get(string);
 }
+
+callASPCMenuService("frary", new Date(), "lunch");
