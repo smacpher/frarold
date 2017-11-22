@@ -17,14 +17,14 @@ const authoTokenPath =
  */
 exports.fraroldWebhook = (req, res) => {
     // Both diningHall and meal are required parameters.
-    let diningHall = req.body.result.parameters['dining_hall'];
-    let meal = req.body.result.parameters['meal'];
+    let diningHall = req.body.result.parameters.dining_hall;
+    let meal = req.body.result.parameters.meal;
 
     let dateObj = new Date();
 
     // Date is an optional parameter. If not present, default to today.
-    if (req.body.result.parameters['date']) {
-        dateObj = new Date(req.body.result.parameters['date']);
+    if (req.body.result.parameters.date) {
+        dateObj = new Date(req.body.result.parameters.date);
     }
 
     callASPCMenuService(diningHall, dateObj, meal).then((output) => {
@@ -34,7 +34,7 @@ exports.fraroldWebhook = (req, res) => {
     }).catch((error) => {
         // Let the user know if there is an error.
         res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify({'speech': error, 'displayText': error}));
+        res.send(JSON.stringify({'speech': "fuck", 'displayText': "fuck"}));
     });
 };
 
@@ -51,7 +51,7 @@ function callASPCMenuService (diningHall, dateObj, meal) {
             dayPath + day + '/' + mealPath + meal + '/' +
             authoTokenPath;
 
-        console.log('callASPCMenuService: HTTP GET ' + path);
+        console.log('callASPCMenuService: http get ' + path);
 
         https.get(
             path,
@@ -61,25 +61,28 @@ function callASPCMenuService (diningHall, dateObj, meal) {
                 // Collect chunks of the response.
                 resp.on('data', (chunk) => {
                     data += chunk;
+                    console.log('callASPCMenuService: chunk received: ' + chunk);
                 });
 
                 // Response done.
                 resp.on('end', () => {
                     let result = JSON.parse(data)[0];
-                    let foodItems = result.foodItems;
+                    let foodItems = result.food_items;
 
+                    console.log('callASPCMenuService: foodItems = ' + foodItems);
                     let output = '';
                     for (var i in foodItems) {
                         let item = foodItems[i];
                         output += item;
                     }
 
+                    console.log('callASPCMenuService: output: ' + output);
                     // Resolve promise.
                     resolve(output);
                 });
 
-            }).on("error", (error) => {
-                console.log("Error: " + error.message);
+            }).on("error", (err) => {
+                console.log("callASPCMenuService: ERROR: " + err.message);
                 reject(error);
             });
   });
