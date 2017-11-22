@@ -1,0 +1,1 @@
+gcloud beta functions call fraroldWebhook --data '{"result": {"parameters": {"dining_hall": "frary", "meal": "lunch"}}}'

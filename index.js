@@ -53,39 +53,39 @@ function callASPCMenuService (diningHall, dateObj, meal) {
 
         console.log('callASPCMenuService: http get ' + path);
 
-        https.get(
-            path,
-            (resp) => {
-                let data = '';
-
-                // Collect chunks of the response.
-                resp.on('data', (chunk) => {
-                    data += chunk;
-                    console.log('callASPCMenuService: chunk received: ' + chunk);
-                });
-
-                // Response done.
-                resp.on('end', () => {
-                    let result = JSON.parse(data)[0];
-                    let foodItems = result.food_items;
-
-                    console.log('callASPCMenuService: foodItems = ' + foodItems);
-                    let output = '';
-                    for (var i in foodItems) {
-                        let item = foodItems[i];
-                        output += item;
-                    }
-
-                    console.log('callASPCMenuService: output: ' + output);
-                    // Resolve promise.
-                    resolve(output);
-                });
-
-            }).on("error", (err) => {
-                console.log("callASPCMenuService: ERROR: " + err.message);
-                reject(error);
+        // Make API call.
+        https.get(path, (resp) => {
+            // Collect chunks of the response.
+            let data = '';
+            resp.on('data', (chunk) => {
+                data += chunk;
+                console.log('callASPCMenuService: chunk received: ' + chunk);
             });
-  });
+
+            // Response done.
+            resp.on('end', () => {
+                let result = JSON.parse(data)[0];
+                let foodItems = result.food_items;
+                let output = '';
+                output += capitalizeFirstLetter(diningHall) + ' has ';
+                for (var i in foodItems) {
+                    let item = foodItems[i];
+                    if (i != foodItems.length - 1) {
+                        output += item + ', ';
+                    }
+                }
+                output += 'for ' + meal + '.'
+                console.log('callASPCMenuService: output: ' + output);
+
+                // Resolve promise.
+                resolve(output);
+            });
+
+        }).on("error", (err) => {
+            console.log("callASPCMenuService: ERROR: " + err.message);
+            reject(error);
+        });
+    });
 }
 
 function getDayFromDateObj(dateObj) {
@@ -99,4 +99,8 @@ function getDayFromDateObj(dateObj) {
     }
 
     return day;
+}
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
