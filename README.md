@@ -21,3 +21,4 @@ https://cloud.google.com/sdk/downloads
 ASPC Menu API: https://aspc.pomona.edu/api/
 Dialogflow: https://dialogflow.com/
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
