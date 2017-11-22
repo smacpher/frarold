@@ -4,11 +4,12 @@
 
 'use strict';
 const https = require('https');
-const frarold_host = 'https://aspc.pomona.edu/api/menu/';
-const frarold_dining_hall_path = 'dining_hall/';
-const frarold_day_path = 'day/';
-const frarold_meal_path = 'meal/';
-const frarold_auth_token_path = 
+
+const aspcMenuEndpoint = 'https://aspc.pomona.edu/api/menu/';
+const diningHallPath = 'dining_hall/';
+const dayPath = 'day/';
+const mealPath = 'meal/';
+const authoTokenPath = 
     '?auth_token=447715aa4a6d9406e9b613f468bc6ccc9f02f20c';
 
 /*
@@ -16,13 +17,17 @@ const frarold_auth_token_path =
  */
 exports.fraroldWebhook = (req, res) => {
 
-    // Both dining_hall and meal are required parameters.
-    // TODO: make conversation branching to fetch these params should the
-    // user not provide them.
-    let dining_hall = req.body.result.parameters['dining_hall'];
+    // Both diningHall and meal are required parameters.
+    let diningHall = req.body.result.parameters['dining_hall'];
     let meal = req.body.result.parameters['meal'];
 
-    callASPCMenuService(dining_hall, meal).then((output) => {
+    let dateObj = new Date();
+
+    // Date is an optional parameter. If not present, default to today.
+    if (req.body.result.parameters['date']) {
+        dateObj = new Date(req.body.result.parameters['date']);
+    }
+    callASPCMenuService(diningHall, date, meal).then((output) => {
         // Return the results of the ASPC Menu API to Dialogflow.
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify({'speech': output, 'displayText': output}));
@@ -36,12 +41,15 @@ exports.fraroldWebhook = (req, res) => {
 /*
  * Helper functions.
  */
-function callASPCMenuService (dining_hall, meal) {
+function callASPCMenuService (diningHall, dateObj, meal) {
     return new Promise((resolve, reject) => {
-        let day = 'mon';
-        let path = frarold_host + frarold_dining_hall_path + dining_hall + '/' +
-            frarold_day_path + day + '/' + frarold_meal_path + meal + '/' +
-            frarold_auth_token_path;
+        // Get three-letter abbreviation of the date.
+        let day = getDayFromDateObj(dateObj);
+
+        // Construct HTTP GET path.
+        let path = aspcMenuEndpoint + diningHallPath + diningHall + '/' +
+            dayPath + day + '/' + mealPath + meal + '/' +
+            authoTokenPath;
 
         console.log('callASPCMenuService: HTTP GET ' + path);
 
@@ -50,31 +58,45 @@ function callASPCMenuService (dining_hall, meal) {
             (resp) => {
                 let data = '';
 
+                // Collect chunks of the response.
                 resp.on('data', (chunk) => {
                     data += chunk;
                 });
 
+                // Response done.
                 resp.on('end', () => {
                     let result = JSON.parse(data)[0];
-                    let food_items = result.food_items;
+                    let foodItems = result.foodItems;
 
                     let output = '';
-                    for (var i in food_items) {
-                        let item = food_items[i];
+                    for (var i in foodItems) {
+                        let item = foodItems[i];
                         output += item;
                     }
-                    resolve(output);
 
+                    // Resolve promise.
+                    resolve(output);
                 });
 
-            }).on("error", (err) => {
-                console.log("Error: " + err.message);
+            }).on("error", (error) => {
+                console.log("Error: " + error.message);
                 reject(error);
             });
   });
 }
 
-function getDay (date) {
-    let date = new Date(dateStr);
+function getDayFromDateObj(dateObj) {
+    // Parse out three-letter abbreviation of day.
+    let day = dateObj.toString().split(' ')[0].toLowerCase();
+
+    // Handle invalid date case; default to today's date.
+    if (day === 'Invalid') {
+        dateObj = new Date();
+        day = getDayFromDateObj(dateObj);
+    }
+
+    return day;
 }
 
+// console.log(callASPCMenuService("frary", new Date(), "lunch"));
+// console.log(getDayFromDateObj(new Date()));
