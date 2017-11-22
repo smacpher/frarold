@@ -1,3 +1,1 @@
-Flask==0.12.2
-jsonpickle==0.9.4
-pycloudfn==0.1.206
+api.ai==0.1.0

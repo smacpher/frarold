@@ -20,9 +20,10 @@ exports.fraroldWebhook = (req, res) => {
     let diningHall = req.body.result.parameters.dining_hall;
     let meal = req.body.result.parameters.meal;
 
+    // Initialize to today's date.
     let dateObj = new Date();
 
-    // Date is an optional parameter. If not present, default to today.
+    // Date is an optional parameter. If present, update to reflect date in req.
     if (req.body.result.parameters.date) {
         dateObj = new Date(req.body.result.parameters.date);
     }
@@ -44,7 +45,7 @@ exports.fraroldWebhook = (req, res) => {
 function callASPCMenuService (diningHall, dateObj, meal) {
     return new Promise((resolve, reject) => {
         // Get three-letter abbreviation of the date.
-        let day = getDayFromDateObj(dateObj);
+        let day = getDayAbbrevFromDateObj(dateObj);
 
         // Construct HTTP GET path.
         let path = aspcMenuEndpoint + diningHallPath + diningHall + '/' +
@@ -52,6 +53,14 @@ function callASPCMenuService (diningHall, dateObj, meal) {
             authoTokenPath;
 
         console.log('callASPCMenuService: http get ' + path);
+
+        // Initialize outputDay to day of the week.
+        let outputDay = getDayFromDateObj(dateObj);
+
+        // If dateObj is today, use "today" instead.
+        if (new Date().getDay() == dateObj.getDay()) {
+            outputDay = 'today';
+        }
 
         // Make API call.
         https.get(path, (resp) => {
@@ -65,9 +74,19 @@ function callASPCMenuService (diningHall, dateObj, meal) {
             // Response done.
             resp.on('end', () => {
                 let result = JSON.parse(data)[0];
+                let noMealDataOutput =
+                    'Hmm...that\'s weird. It looks like ' +
+                    prettifyDiningHallEntityName(diningHall) +
+                    ' didn\'t post ' + meal + ' ' + outputDay + '.';
+
+                // No meal data for some reason.
+                if (!result) {
+                    resolve(noMealDataOutput)
+                }
+
                 let foodItems = result.food_items;
                 let output = '';
-                output += capitalizeFirstLetter(diningHall) + ' has ';
+                output += prettifyDiningHallEntityName(diningHall) + ' has ';
                 for (var i in foodItems) {
                     let item = foodItems[i];
                     if (i != foodItems.length - 1) {
@@ -88,7 +107,8 @@ function callASPCMenuService (diningHall, dateObj, meal) {
     });
 }
 
-function getDayFromDateObj(dateObj) {
+/* Converts Javascript Date object to three-letter abbreviation of day. */
+function getDayAbbrevFromDateObj(dateObj) {
     // Parse out three-letter abbreviation of day.
     let day = dateObj.toString().split(' ')[0].toLowerCase();
 
@@ -101,7 +121,29 @@ function getDayFromDateObj(dateObj) {
     return day;
 }
 
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+/* Converts Javascript Date object to full day name. */
+function getDayFromDateObj(dateObj) {
+    let days = [
+        'Monday', 
+        'Tuesday', 
+        'Wednesday', 
+        'Thursday', 
+        'Friday', 
+        'Saturday',
+        'Sunday'
+    ];
+    return days[dateObj.getDay()];
 }
-l
+
+/* Converts Dialogflow Agent dining_hall entity names to prettier names. */
+function prettifyDiningHallEntityName(string) {
+    let diningHallNameMap = new Map([
+        ['frank', 'Frank'],
+        ['frary', 'Frary'],
+        ['cmc', 'Collins'],
+        ['scripps', 'Scripps'],
+        ['pitzer', 'Pitzer'],
+        ['oldenburg', 'Oldenburg']
+    ]);
+    return diningHallNameMap.get(string);
+}
