@@ -4,7 +4,10 @@ Ask me about food at the 5C's.
 ## Talk to me!
 So far, you can only talk to me through the command line.
 
-To do this, open Terminal and use the following command:
+First, take a look at the Dependencies section below to install
+everything that helps me run properly.
+
+Once you're done with that, open Terminal and use the following command:
 `python frarold/python_client.py`
 
 ## Dependencies
