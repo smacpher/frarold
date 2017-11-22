@@ -16,7 +16,6 @@ const authoTokenPath =
  * Dialogflow Webhooks.
  */
 exports.fraroldWebhook = (req, res) => {
-
     // Both diningHall and meal are required parameters.
     let diningHall = req.body.result.parameters['dining_hall'];
     let meal = req.body.result.parameters['meal'];
@@ -27,6 +26,7 @@ exports.fraroldWebhook = (req, res) => {
     if (req.body.result.parameters['date']) {
         dateObj = new Date(req.body.result.parameters['date']);
     }
+
     callASPCMenuService(diningHall, dateObj, meal).then((output) => {
         // Return the results of the ASPC Menu API to Dialogflow.
         res.setHeader('Content-Type', 'application/json');
@@ -90,25 +90,10 @@ function getDayFromDateObj(dateObj) {
     let day = dateObj.toString().split(' ')[0].toLowerCase();
 
     // Handle invalid date case; default to today's date.
-    if (day === 'Invalid') {
+    if (day.toLowerCase() === 'invalid') {
         dateObj = new Date();
         day = getDayFromDateObj(dateObj);
     }
 
     return day;
 }
-
-function testASPCMenuService(diningHall, date, meal) {
-    let dateObj = new Date(date);
-
-    callASPCMenuService(diningHall, dateObj, meal).then((output) => {
-            console.log(output);
-        }).catch((error) => {
-            console.log(output);
-        });
-}
-
-testASPCMenuService("frary", "2017-11-22", "dinner");
-
-// console.log(callASPCMenuService("frary", new Date(), "lunch"));
-// console.log(getDayFromDateObj(new Date()));
