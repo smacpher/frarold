@@ -27,7 +27,7 @@ exports.fraroldWebhook = (req, res) => {
     if (req.body.result.parameters['date']) {
         dateObj = new Date(req.body.result.parameters['date']);
     }
-    callASPCMenuService(diningHall, date, meal).then((output) => {
+    callASPCMenuService(diningHall, dateObj, meal).then((output) => {
         // Return the results of the ASPC Menu API to Dialogflow.
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify({'speech': output, 'displayText': output}));
@@ -97,6 +97,18 @@ function getDayFromDateObj(dateObj) {
 
     return day;
 }
+
+function testASPCMenuService(diningHall, date, meal) {
+    let dateObj = new Date(date);
+
+    callASPCMenuService(diningHall, dateObj, meal).then((output) => {
+            console.log(output);
+        }).catch((error) => {
+            console.log(output);
+        });
+}
+
+testASPCMenuService("frary", "2017-11-22", "dinner");
 
 // console.log(callASPCMenuService("frary", new Date(), "lunch"));
 // console.log(getDayFromDateObj(new Date()));
