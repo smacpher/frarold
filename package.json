@@ -1,0 +1,19 @@
+{
+  "name": "frarold",
+  "version": "0.0.1",
+  "description": "A Chatbot that knows all about the food at the 5Cs.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smacpher/frarold.git"
+  },
+  "author": "Sean MacPherson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/smacpher/frarold/issues"
+  },
+  "homepage": "https://github.com/smacpher/frarold#readme"
+}

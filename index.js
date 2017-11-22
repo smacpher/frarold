@@ -74,7 +74,7 @@ function callASPCMenuService (dining_hall, meal) {
   });
 }
 
-function getToday (datetime) {
-
+function getDay (date) {
+    let date = new Date(dateStr);
 }
 
