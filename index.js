@@ -21,14 +21,15 @@ exports.fraroldWebhook = (req, res) => {
 
     switch (intentName) {
         case 'food_list':
-            console.log('fraroldWebhook: matched \'food_list\' intent.')
-            food_list (req, res);
+            console.log('fraroldWebhook: matched \'food_list\' intent.');
+            foodList(req, res);
             break;
         case 'food_search':
-            console.log('fraroldWebhook: matched \'food_search\' intent.')
+            console.log('fraroldWebhook: matched \'food_search\' intent.');
+            foodSearch(req, res);
             break;
         default:
-            console.log('fraroldWebhook: !!new intent matched!!')
+            console.log('fraroldWebhook: !!new intent matched!!');
     }
 };
 
@@ -187,7 +188,7 @@ function getSingleMealMenu (diningHall, dateObj, meal) {
  */
 function searchForFoodItem(food_item, dateObj, meal) {
     return new Promise((resolve, reject) => {
-        
+       // TODO 
     });
 }
 
