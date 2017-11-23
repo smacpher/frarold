@@ -34,7 +34,7 @@ you will need to install the Google Cloud SDK found here:
 https://cloud.google.com/sdk/downloads
 
 ## Acknowledgements
-ASPC Menu API: https://aspc.pomona.edu/api/
-Dialogflow: https://dialogflow.com/
+- ASPC Menu API: https://aspc.pomona.edu/api/
+- Dialogflow: https://dialogflow.com/
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
