@@ -15,5 +15,6 @@
   "bugs": {
     "url": "https://github.com/smacpher/frarold/issues"
   },
-  "homepage": "https://github.com/smacpher/frarold#readme"
+  "homepage": "https://github.com/smacpher/frarold#readme",
+  "dependencies": {}
 }
