@@ -2,5 +2,6 @@
 but refer to the same dining hall (any combination of entities)
 - Figure out slot filling / conversation branching using python client.
 - Add feature to search for dining halls with certain food.
+- Add dining hall hours.
 - Low Priority: Figure out how to use threading to show loading animation.
 
