@@ -18,9 +18,9 @@ Pitzer, Mudd). Also, don't worry about the phrasing or the names you choose
 to use, Frarold can understand pretty much any format!
 
 _Examples_:
-"What's for lunch at CMC tomorrow?"
-"What's oldy having for lunch today?"
-"Pitzer dinner?" (Frarold will assume you want to know about today's meals
+- "What's for lunch at CMC tomorrow?"
+- "What's oldy having for lunch today?"
+- "Pitzer dinner?" (Frarold will assume you want to know about today's meals
 if no meal is specified)
 
 ## Dependencies
