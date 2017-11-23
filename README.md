@@ -10,6 +10,19 @@ everything that helps me run properly.
 Once you're done with that, open Terminal and use the following command:
 `python frarold/python_client.py`
 
+### Example queries
+Here are some example queries to get you started; essentially, you can
+ask about any meal (breakfast, lunch, or dinner) for any day of the week
+at any dining hall on campus (Frank, Frary, Collins, Scripps, Oldenburg,
+Pitzer, Mudd). Also, don't worry about the phrasing or the names you choose
+to use, Frarold can understand pretty much any format!
+
+_Examples_:
+"What's for lunch at CMC tomorrow?"
+"What's oldy having for lunch today?"
+"Pitzer dinner?" (Frarold will assume you want to know about today's meals
+if no meal is specified)
+
 ## Dependencies
 To use the Python CLI Client, you will need to install the
 Dialogflow Python SDK here: 
