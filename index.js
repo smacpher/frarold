@@ -13,7 +13,6 @@ const mealPath = 'meal/';
 const authTokenPath = 
     '?auth_token=447715aa4a6d9406e9b613f468bc6ccc9f02f20c';
 
-const diningHalls = ['frank', 'frary', 'cmc', 'scripps', 'pitzer', 'oldenburg'];
 /***
  * Dialogflow Webhooks.
  ***/
@@ -30,7 +29,7 @@ exports.fraroldWebhook = (req, res) => {
             foodSearch(req, res);
             break;
         default:
-            console.log('fraroldWebhook: !!new intent matched!!');
+            console.log('fraroldWebhook: !!unknown intent matched!!');
     }
 };
 
@@ -116,7 +115,7 @@ function getSingleMealMenu (diningHall, dateObj, meal) {
         // Get three-letter abbreviation of the date.
         let dayAbbrev = getDayAbbrevFromDateObj(dateObj);
         let path = buildSingleMealMenuHTTPPath(diningHall, dayAbbrev, meal);
-        console.log('callASPCMenuService: http get ' + path);
+        console.log('getSingleMealMenu: http get ' + path);
 
         https.get(path, (resp) => {
 
@@ -124,39 +123,47 @@ function getSingleMealMenu (diningHall, dateObj, meal) {
             let data = '';
             resp.on('data', (chunk) => {
                 data += chunk;
-                console.log('callASPCMenuService: chunk received: ' + chunk);
+                console.log('getSingleMealMenu: chunk received: ' + chunk);
             });
 
             // Response done.
             resp.on('end', () => {
                 let output;
                 let result = JSON.parse(data)[0];
-                console.log('callASPCMenuService: result: ' + result);
+                console.log('getSingleMealMenu: result: ' + result);
 
-                // No meal data for some reason.
+                // No meal data at diningHall for given date and meal.
                 if (!result) {
-                    output = buildNoMealDataOutputResponse(
+                    output = buildNoMealDataResponse(
                         diningHall, 
                         dateObj, 
                         meal
                     );
                 } else {
-                    output = buildSingleMealMenuOutput(
+                    output = buildSingleMealMenuResponse(
                         result.food_items,
                         diningHall, 
                         dateObj, 
                         meal
                     );
                 }
-                console.log('callASPCMenuService: output: ' + output);
+                console.log('getSingleMealMenu: output: ' + output);
                 resolve(output);
             });
 
         }).on("error", (error) => {
-            console.log("callASPCMenuService: ERROR: " + error.message);
+            console.log("getSingleMealMenu: ERROR: " + error.message);
             reject(error);
         });
     });
+}
+
+function 
+/**
+ * Returns an array of dining hall names compatible with the ASPC Menu API.
+ */
+function diningHalls() {
+    return ['frary', 'frank', 'cmc', 'scripps', 'pitzer', 'oldenburg'];
 }
 
 /**
@@ -167,12 +174,12 @@ function getSingleMealMenu (diningHall, dateObj, meal) {
  * @param {Date} dateObj - Built in Javascript Date object; used to match food
  *  item across dining halls for a specific day of the week.
  */
-function searchForFoodItemAtDiningHall (food_item, diningHall, dateObj, meal) {
+function getDiningHallWithFoodItem (foodItem, diningHall, dateObj, meal) {
     return new Promise((resolve, reject) => {
         // Get three-letter abbreviation of the date.
         let day = getDayAbbrevFromDateObj(dateObj);
         let path = buildSingleMealMenuHTTPPath(diningHall, day, meal);
-        console.log('callASPCMenuService: http get ' + path);
+        console.log('getDiningHallWithFoodItem: http get ' + path);
 
         https.get(path, (resp) => {
 
@@ -180,19 +187,41 @@ function searchForFoodItemAtDiningHall (food_item, diningHall, dateObj, meal) {
             let data = '';
             resp.on('data', (chunk) => {
                 data += chunk;
-                console.log('callASPCMenuService: chunk received: ' + chunk);
+                console.log(
+                    'getDiningHallWithFoodItem: chunk received: ' + chunk
+                );
             });
 
             // Response done.
             resp.on('end', () => {
+                let output;
                 let result = JSON.parse(data)[0];
 
-                console.log('callASPCMenuService: output: ' + output);
+                // No meal data at diningHall for given date and meal.
+                if (!result) {
+                    output = buildNoMealDataResponse(
+                        diningHall,
+                        dateObj,
+                        meal
+                    )
+                } else {
+                    // Search through food_items.
+                    // TODO.
+                    // Else not found.
+                    output = buildFoodItemNotFoundResponse(
+                        foodItem,
+                        diningHall,
+                        dateObj,
+                        meal
+                    )
+                }
+
+                console.log('getDiningHallWithFoodItem: output: ' + output);
                 resolve(output);
             });
 
         }).on("error", (error) => {
-            console.log("callASPCMenuService: ERROR: " + error.message);
+            console.log("getDiningHallWithFoodItem: ERROR: " + error.message);
             reject(error);
         });
     });
@@ -229,10 +258,12 @@ function buildSingleMealMenuHTTPPath (diningHall, day, meal) {
  * @param {string} meal: Target meal: Valid options are 
  *  'breakfast', 'brunch', 'lunch', and 'dinner'.
  */
-function buildSingleMealMenuOutput (foodItems, diningHall, dateObj, meal) {
+function buildSingleMealMenuResponse (foodItems, diningHall, dateObj, meal) {
     let output = '';
     let day = prettifyDayName(dateObj);
-    output += prettifyDiningHallEntityName(diningHall) + ' has ';
+    let diningHallName = prettifyDiningHallName(diningHall);
+
+    output += diningHallName + ' has ';
 
     // Add each food item to the output.
     for (var i in foodItems) {
@@ -243,7 +274,20 @@ function buildSingleMealMenuOutput (foodItems, diningHall, dateObj, meal) {
             output += 'and ' + item + ' ';
         }
     }
+
     output += 'for ' + meal + ' ' + day + '.';
+
+    return output;
+}
+
+function buildFoodItemNotFoundResponse (foodItem, diningHall, dateObj, meal) {
+    let output = '';
+    let day = prettifyDayName(dateObj);
+    let diningHallName = prettifyDiningHallName(diningHall);
+
+    output += diningHallName + ' doesn\'t have ' + foodItem + ' for ' + 
+        meal + ' ' + day + '.';
+
     return output;
 }
 
@@ -257,11 +301,11 @@ function buildSingleMealMenuOutput (foodItems, diningHall, dateObj, meal) {
  * @param {string} meal - Valid options are 'breakfast', 'brunch', 'lunch', and
  *  'dinner'.
  */
-function buildNoMealDataOutputResponse (diningHall, dateObj, meal) {
+function buildNoMealDataResponse (diningHall, dateObj, meal) {
     let day = prettifyDayName(dateObj);
     let noMealDataOutput =
         'Hmm...that\'s weird. It looks like ' +
-        prettifyDiningHallEntityName(diningHall) +
+        prettifyDiningHallName(diningHall) +
         ' didn\'t post ' + meal + ' ' + day + '.';
 
     return noMealDataOutput;
@@ -345,7 +389,7 @@ function getDayFromDateObj (dateObj) {
  * @param {String} string - Dining hall to be converted. Valid options are
  *  'frank', 'frary', 'cmc', 'scripps', 'pitzer', and 'oldenburg'.
  */
-function prettifyDiningHallEntityName (string) {
+function prettifyDiningHallName (string) {
     let diningHallNameMap = new Map([
         ['frank', 'Frank'],
         ['frary', 'Frary'],
@@ -359,3 +403,4 @@ function prettifyDiningHallEntityName (string) {
 
 /*** LOCAL TESTS ***/
 getSingleMealMenu('frary', new Date(), 'lunch');
+getDiningHallWithFoodItem('chicken', 'frary', new Date(), 'lunch');
