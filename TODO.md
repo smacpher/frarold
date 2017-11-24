@@ -6,5 +6,6 @@ it work whether or not user defines meal. if user doesnt define meal, then
 fetch dining halls and report for which meals they have the match.
 - Add dining hall hours.
 - Bug: Need to fix date offset thing.
+- Bug: Python client cant understand food_search intent User Says.
 - Low Priority: Figure out how to use threading to show loading animation.
 
