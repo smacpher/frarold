@@ -203,7 +203,670 @@ else returns today's Date obj.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line202">line 202</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line333">line 333</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="buildNoMealDataResponse"><span class="type-signature"></span>buildNoMealDataResponse<span class="signature">(diningHall, dateObj, meal)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Builds a string response for when there is no meal data.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>diningHall</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Valid options are 'frank', 'frary', 'cmc', 
+ 'scripps', 'pitzer', and 'oldenburg'.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dateObj</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Date</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Built in Javascript Date object; used to fetch meal
+ for a specific day of the week.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>meal</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Valid options are 'breakfast', 'brunch', 'lunch', and
+ 'dinner'.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line303">line 303</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="buildSingleMealMenuHTTPPath"><span class="type-signature"></span>buildSingleMealMenuHTTPPath<span class="signature">(diningHall:, day:, meal:)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Builds the HTTP GET path that fetches a given meal on a given day at a given
+dining hall.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>diningHall:</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Target dining hall. Valid options are 
+ 'frank', 'frary', 'cmc', 'scripps', 'pitzer', and 'oldenburg'.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>day:</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Target day of the week. Valid options are 
+ 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', or 'sun'.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>meal:</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Target meal: Valid options are 
+ 'breakfast', 'brunch', 'lunch', and 'dinner'.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line240">line 240</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="buildSingleMealMenuResponse"><span class="type-signature"></span>buildSingleMealMenuResponse<span class="signature">(foodItems, diningHall:, day:, meal:)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Builds the string response for a query for a single dining halls' 
+menu on a certain day.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>foodItems</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">List of food items in menu.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>diningHall:</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Target dining hall. Valid options are 
+ 'frank', 'frary', 'cmc', 'scripps', 'pitzer', and 'oldenburg'.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>day:</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Target day of the week. Valid options are 
+ 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', or 'sun'.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>meal:</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Target meal: Valid options are 
+ 'breakfast', 'brunch', 'lunch', and 'dinner'.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line260">line 260</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="diningHalls"><span class="type-signature"></span>diningHalls<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns an array of dining hall names compatible with the ASPC Menu API.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line164">line 164</a>
     </li></ul></dd>
     
 
@@ -356,7 +1019,7 @@ intent.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line53">line 53</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line54">line 54</a>
     </li></ul></dd>
     
 
@@ -510,7 +1173,7 @@ g
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line83">line 83</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line84">line 84</a>
     </li></ul></dd>
     
 
@@ -647,7 +1310,7 @@ the day of the week - 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', or 'sun'.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line221">line 221</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line352">line 352</a>
     </li></ul></dd>
     
 
@@ -784,7 +1447,167 @@ formatting purposes.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line241">line 241</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line372">line 372</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getDiningHallWithFoodItem"><span class="type-signature"></span>getDiningHallWithFoodItem<span class="signature">(food_item, dateObj)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Finds all dining halls that are serving food_item for the given day and meal.
+Makes a call to the ASPC Menu API and constructs Frarold's response.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>food_item</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Food item to search for.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dateObj</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Date</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Built in Javascript Date object; used to match food
+ item across dining halls for a specific day of the week.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line176">line 176</a>
     </li></ul></dd>
     
 
@@ -969,7 +1792,7 @@ Makes a call to the ASPC Menu API and constructs Frarold's response.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line112">line 112</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line113">line 113</a>
     </li></ul></dd>
     
 
@@ -1003,7 +1826,7 @@ Makes a call to the ASPC Menu API and constructs Frarold's response.
     
 
     
-    <h4 class="name" id="prettifyDiningHallEntityName"><span class="type-signature"></span>prettifyDiningHallEntityName<span class="signature">(string)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="prettifyDiningHallName"><span class="type-signature"></span>prettifyDiningHallName<span class="signature">(string)</span><span class="type-signature"></span></h4>
     
 
     
@@ -1105,167 +1928,7 @@ Makes a call to the ASPC Menu API and constructs Frarold's response.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line260">line 260</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="searchForFoodItem"><span class="type-signature"></span>searchForFoodItem<span class="signature">(food_item, dateObj)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Finds all dining halls that are serving food_item for the given day and meal.
-Makes a call to the ASPC Menu API and constructs Frarold's response.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>food_item</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Food item to search for.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>dateObj</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Date</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Built in Javascript Date object; used to match food
- item across dining halls for a specific day of the week.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line188">line 188</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line391">line 391</a>
     </li></ul></dd>
     
 
@@ -1309,13 +1972,13 @@ Makes a call to the ASPC Menu API and constructs Frarold's response.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#buildDateObj">buildDateObj</a></li><li><a href="global.html#foodList">foodList</a></li><li><a href="global.html#foodSearch">foodSearch</a></li><li><a href="global.html#getDayAbbrevFromDateObj">getDayAbbrevFromDateObj</a></li><li><a href="global.html#getDayFromDateObj">getDayFromDateObj</a></li><li><a href="global.html#getSingleMealMenu">getSingleMealMenu</a></li><li><a href="global.html#prettifyDiningHallEntityName">prettifyDiningHallEntityName</a></li><li><a href="global.html#searchForFoodItem">searchForFoodItem</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#buildDateObj">buildDateObj</a></li><li><a href="global.html#buildNoMealDataResponse">buildNoMealDataResponse</a></li><li><a href="global.html#buildSingleMealMenuHTTPPath">buildSingleMealMenuHTTPPath</a></li><li><a href="global.html#buildSingleMealMenuResponse">buildSingleMealMenuResponse</a></li><li><a href="global.html#diningHalls">diningHalls</a></li><li><a href="global.html#foodList">foodList</a></li><li><a href="global.html#foodSearch">foodSearch</a></li><li><a href="global.html#getDayAbbrevFromDateObj">getDayAbbrevFromDateObj</a></li><li><a href="global.html#getDayFromDateObj">getDayFromDateObj</a></li><li><a href="global.html#getDiningHallWithFoodItem">getDiningHallWithFoodItem</a></li><li><a href="global.html#getSingleMealMenu">getSingleMealMenu</a></li><li><a href="global.html#prettifyDiningHallName">prettifyDiningHallName</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Nov 23 2017 00:50:29 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Nov 23 2017 23:15:39 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>

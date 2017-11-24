@@ -38,7 +38,7 @@ const aspcMenuEndpoint = 'https://aspc.pomona.edu/api/menu/';
 const diningHallPath = 'dining_hall/';
 const dayPath = 'day/';
 const mealPath = 'meal/';
-const authoTokenPath = 
+const authTokenPath = 
     '?auth_token=447715aa4a6d9406e9b613f468bc6ccc9f02f20c';
 
 /***
@@ -49,14 +49,15 @@ exports.fraroldWebhook = (req, res) => {
 
     switch (intentName) {
         case 'food_list':
-            console.log('fraroldWebhook: matched \'food_list\' intent.')
-            food_list (req, res);
+            console.log('fraroldWebhook: matched \'food_list\' intent.');
+            foodList(req, res);
             break;
         case 'food_search':
-            console.log('fraroldWebhook: matched \'food_search\' intent.')
+            console.log('fraroldWebhook: matched \'food_search\' intent.');
+            foodSearch(req, res);
             break;
         default:
-            console.log('fraroldWebhook: !!new intent matched!!')
+            console.log('fraroldWebhook: !!unknown intent matched!!');
     }
 };
 
@@ -140,69 +141,56 @@ function foodSearch (req, res) {
 function getSingleMealMenu (diningHall, dateObj, meal) {
     return new Promise((resolve, reject) => {
         // Get three-letter abbreviation of the date.
-        let day = getDayAbbrevFromDateObj(dateObj);
+        let dayAbbrev = getDayAbbrevFromDateObj(dateObj);
+        let path = buildSingleMealMenuHTTPPath(diningHall, dayAbbrev, meal);
+        console.log('getSingleMealMenu: http get ' + path);
 
-        // Construct HTTP GET path.
-        let path = aspcMenuEndpoint + diningHallPath + diningHall + '/' +
-            dayPath + day + '/' + mealPath + meal + '/' +
-            authoTokenPath;
-
-        console.log('callASPCMenuService: http get ' + path);
-
-        // Initialize outputDay to day of the week.
-        let outputDay = getDayFromDateObj(dateObj);
-
-        // If dateObj is today, use "today" instead.
-        if (new Date().getDay() == dateObj.getDay()) {
-            outputDay = 'today';
-        }
-
-        // Make API call.
         https.get(path, (resp) => {
+
             // Collect chunks of the response.
             let data = '';
             resp.on('data', (chunk) => {
                 data += chunk;
-                console.log('callASPCMenuService: chunk received: ' + chunk);
+                console.log('getSingleMealMenu: chunk received: ' + chunk);
             });
 
             // Response done.
             resp.on('end', () => {
+                let output;
                 let result = JSON.parse(data)[0];
-                let noMealDataOutput =
-                    'Hmm...that\'s weird. It looks like ' +
-                    prettifyDiningHallEntityName(diningHall) +
-                    ' didn\'t post ' + meal + ' ' + outputDay + '.';
+                console.log('getSingleMealMenu: result: ' + result);
 
-                // No meal data for some reason.
+                // No meal data at diningHall for given date and meal.
                 if (!result) {
-                    resolve(noMealDataOutput)
+                    output = buildNoMealDataResponse(
+                        diningHall, 
+                        dateObj, 
+                        meal
+                    );
+                } else {
+                    output = buildSingleMealMenuResponse(
+                        result.food_items,
+                        diningHall, 
+                        dateObj, 
+                        meal
+                    );
                 }
-
-                let foodItems = result.food_items;
-                let output = '';
-                output += prettifyDiningHallEntityName(diningHall) + ' has ';
-
-                for (var i in foodItems) {
-                    let item = foodItems[i];
-                    if (i &lt; foodItems.length - 1) {
-                        output += item + ', ';
-                    } else {
-                        output += 'and ' + item + ' ';
-                    }
-                }
-                output += 'for ' + meal + ' ' + outputDay + '.';
-                console.log('callASPCMenuService: output: ' + output);
-
-                // Resolve promise.
+                console.log('getSingleMealMenu: output: ' + output);
                 resolve(output);
             });
 
         }).on("error", (error) => {
-            console.log("callASPCMenuService: ERROR: " + error.message);
+            console.log("getSingleMealMenu: ERROR: " + error.message);
             reject(error);
         });
     });
+}
+
+/**
+ * Returns an array of dining hall names compatible with the ASPC Menu API.
+ */
+function diningHalls() {
+    return ['frary', 'frank', 'cmc', 'scripps', 'pitzer', 'oldenburg'];
 }
 
 /**
@@ -213,10 +201,153 @@ function getSingleMealMenu (diningHall, dateObj, meal) {
  * @param {Date} dateObj - Built in Javascript Date object; used to match food
  *  item across dining halls for a specific day of the week.
  */
-function searchForFoodItem(food_item, dateObj, meal) {
+function getDiningHallWithFoodItem (foodItem, diningHall, dateObj, meal) {
     return new Promise((resolve, reject) => {
-        
+        // Get three-letter abbreviation of the date.
+        let day = getDayAbbrevFromDateObj(dateObj);
+        let path = buildSingleMealMenuHTTPPath(diningHall, day, meal);
+        console.log('getDiningHallWithFoodItem: http get ' + path);
+
+        https.get(path, (resp) => {
+
+            // Collect chunks of the response.
+            let data = '';
+            resp.on('data', (chunk) => {
+                data += chunk;
+                console.log(
+                    'getDiningHallWithFoodItem: chunk received: ' + chunk
+                );
+            });
+
+            // Response done.
+            resp.on('end', () => {
+                let output;
+                let result = JSON.parse(data)[0];
+
+                // No meal data at diningHall for given date and meal.
+                if (!result) {
+                    output = buildNoMealDataResponse(
+                        diningHall,
+                        dateObj,
+                        meal
+                    )
+                } else {
+                    // Search through food_items.
+                    // TODO.
+                    // Else not found.
+                    output = buildFoodItemNotFoundResponse(
+                        foodItem,
+                        diningHall,
+                        dateObj,
+                        meal
+                    )
+                }
+
+                console.log('getDiningHallWithFoodItem: output: ' + output);
+                resolve(output);
+            });
+
+        }).on("error", (error) => {
+            console.log("getDiningHallWithFoodItem: ERROR: " + error.message);
+            reject(error);
+        });
     });
+}
+
+/**
+ * Builds the HTTP GET path that fetches a given meal on a given day at a given
+ * dining hall.
+ *
+ * @param {string} diningHall: Target dining hall. Valid options are 
+ *  'frank', 'frary', 'cmc', 'scripps', 'pitzer', and 'oldenburg'.
+ * @param {string} day: Target day of the week. Valid options are 
+ *  'mon', 'tue', 'wed', 'thu', 'fri', 'sat', or 'sun'.
+ * @param {string} meal: Target meal: Valid options are 
+ *  'breakfast', 'brunch', 'lunch', and 'dinner'.
+ */
+function buildSingleMealMenuHTTPPath (diningHall, day, meal) {
+    // HTTP GET path.
+    let path = aspcMenuEndpoint + diningHallPath + diningHall + '/' +
+        dayPath + day + '/' + mealPath + meal + '/' +
+        authTokenPath;
+    return path
+}
+
+/**
+ * Builds the string response for a query for a single dining halls' 
+ * menu on a certain day.
+ *
+ * @param {Array} foodItems - List of food items in menu.
+ * @param {string} diningHall: Target dining hall. Valid options are 
+ *  'frank', 'frary', 'cmc', 'scripps', 'pitzer', and 'oldenburg'.
+ * @param {string} day: Target day of the week. Valid options are 
+ *  'mon', 'tue', 'wed', 'thu', 'fri', 'sat', or 'sun'.
+ * @param {string} meal: Target meal: Valid options are 
+ *  'breakfast', 'brunch', 'lunch', and 'dinner'.
+ */
+function buildSingleMealMenuResponse (foodItems, diningHall, dateObj, meal) {
+    let output = '';
+    let day = prettifyDayName(dateObj);
+    let diningHallName = prettifyDiningHallName(diningHall);
+
+    output += diningHallName + ' has ';
+
+    // Add each food item to the output.
+    for (var i in foodItems) {
+        let item = foodItems[i];
+        if (i &lt; foodItems.length - 1) {
+            output += item + ', ';
+        } else {
+            output += 'and ' + item + ' ';
+        }
+    }
+
+    output += 'for ' + meal + ' ' + day + '.';
+
+    return output;
+}
+
+function buildFoodItemNotFoundResponse (foodItem, diningHall, dateObj, meal) {
+    let output = '';
+    let day = prettifyDayName(dateObj);
+    let diningHallName = prettifyDiningHallName(diningHall);
+
+    output += diningHallName + ' doesn\'t have ' + foodItem + ' for ' + 
+        meal + ' ' + day + '.';
+
+    return output;
+}
+
+/**
+ * Builds a string response for when there is no meal data.
+ *
+ * @param {string} diningHall - Valid options are 'frank', 'frary', 'cmc', 
+ *  'scripps', 'pitzer', and 'oldenburg'.
+ * @param {Date} dateObj - Built in Javascript Date object; used to fetch meal
+ *  for a specific day of the week.
+ * @param {string} meal - Valid options are 'breakfast', 'brunch', 'lunch', and
+ *  'dinner'.
+ */
+function buildNoMealDataResponse (diningHall, dateObj, meal) {
+    let day = prettifyDayName(dateObj);
+    let noMealDataOutput =
+        'Hmm...that\'s weird. It looks like ' +
+        prettifyDiningHallName(diningHall) +
+        ' didn\'t post ' + meal + ' ' + day + '.';
+
+    return noMealDataOutput;
+}
+
+function prettifyDayName (dateObj) {
+    // Initialize outputDay to day of the week.
+    let day = getDayFromDateObj(dateObj);
+
+    // If dateObj is today, use "today" instead.
+    if (new Date().getDay() == dateObj.getDay()) {
+        day = 'today';
+    }
+
+    return day;
 }
 
 /**
@@ -246,7 +377,7 @@ function buildDateObj (req) {
  * @param {Date} - Built in Javascript Date object from which day of the week
  *  will be extracted.
  */
-function getDayAbbrevFromDateObj(dateObj) {
+function getDayAbbrevFromDateObj (dateObj) {
     // Parse out three-letter abbreviation of day.
     let day = dateObj.toString().split(' ')[0].toLowerCase();
 
@@ -266,7 +397,7 @@ function getDayAbbrevFromDateObj(dateObj) {
  * @param {Date} - Built in Javascript Date object from which day of the week
  *  will be extracted.
  */
-function getDayFromDateObj(dateObj) {
+function getDayFromDateObj (dateObj) {
     let days = [
         'Monday', 
         'Tuesday', 
@@ -285,7 +416,7 @@ function getDayFromDateObj(dateObj) {
  * @param {String} string - Dining hall to be converted. Valid options are
  *  'frank', 'frary', 'cmc', 'scripps', 'pitzer', and 'oldenburg'.
  */
-function prettifyDiningHallEntityName(string) {
+function prettifyDiningHallName (string) {
     let diningHallNameMap = new Map([
         ['frank', 'Frank'],
         ['frary', 'Frary'],
@@ -296,7 +427,10 @@ function prettifyDiningHallEntityName(string) {
     ]);
     return diningHallNameMap.get(string);
 }
-</code></pre>
+
+/*** LOCAL TESTS ***/
+getSingleMealMenu('frary', new Date(), 'lunch');
+getDiningHallWithFoodItem('chicken', 'frary', new Date(), 'lunch');</code></pre>
         </article>
     </section>
 
@@ -306,13 +440,13 @@ function prettifyDiningHallEntityName(string) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#buildDateObj">buildDateObj</a></li><li><a href="global.html#foodList">foodList</a></li><li><a href="global.html#foodSearch">foodSearch</a></li><li><a href="global.html#getDayAbbrevFromDateObj">getDayAbbrevFromDateObj</a></li><li><a href="global.html#getDayFromDateObj">getDayFromDateObj</a></li><li><a href="global.html#getSingleMealMenu">getSingleMealMenu</a></li><li><a href="global.html#prettifyDiningHallEntityName">prettifyDiningHallEntityName</a></li><li><a href="global.html#searchForFoodItem">searchForFoodItem</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#buildDateObj">buildDateObj</a></li><li><a href="global.html#buildNoMealDataResponse">buildNoMealDataResponse</a></li><li><a href="global.html#buildSingleMealMenuHTTPPath">buildSingleMealMenuHTTPPath</a></li><li><a href="global.html#buildSingleMealMenuResponse">buildSingleMealMenuResponse</a></li><li><a href="global.html#diningHalls">diningHalls</a></li><li><a href="global.html#foodList">foodList</a></li><li><a href="global.html#foodSearch">foodSearch</a></li><li><a href="global.html#getDayAbbrevFromDateObj">getDayAbbrevFromDateObj</a></li><li><a href="global.html#getDayFromDateObj">getDayFromDateObj</a></li><li><a href="global.html#getDiningHallWithFoodItem">getDiningHallWithFoodItem</a></li><li><a href="global.html#getSingleMealMenu">getSingleMealMenu</a></li><li><a href="global.html#prettifyDiningHallName">prettifyDiningHallName</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Nov 23 2017 00:50:29 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Nov 23 2017 23:15:39 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>

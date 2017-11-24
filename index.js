@@ -5,6 +5,7 @@
 
 'use strict';
 const https = require('https');
+const Fuse = require('fuse.js');
 
 const aspcMenuEndpoint = 'https://aspc.pomona.edu/api/menu/';
 const diningHallPath = 'dining_hall/';
@@ -158,14 +159,6 @@ function getSingleMealMenu (diningHall, dateObj, meal) {
     });
 }
 
-function 
-/**
- * Returns an array of dining hall names compatible with the ASPC Menu API.
- */
-function diningHalls() {
-    return ['frary', 'frank', 'cmc', 'scripps', 'pitzer', 'oldenburg'];
-}
-
 /**
  * Finds all dining halls that are serving food_item for the given day and meal.
  * Makes a call to the ASPC Menu API and constructs Frarold's response.
@@ -206,14 +199,27 @@ function getDiningHallWithFoodItem (foodItem, diningHall, dateObj, meal) {
                     )
                 } else {
                     // Search through food_items.
-                    // TODO.
-                    // Else not found.
-                    output = buildFoodItemNotFoundResponse(
-                        foodItem,
-                        diningHall,
-                        dateObj,
-                        meal
-                    )
+                    let matchedFoodItems = getMatchedFoodItems(
+                        foodItem, 
+                        result.food_items
+                    );
+
+                    // Found an item.
+                    if (matchedFoodItems.length() > 0) {
+                        output = buildFoodItemsFoundResponse(
+                            matchedFoodItems,
+                            diningHall,
+                            dateObj,
+                            meal
+                        )
+                    } else {
+                        output = buildFoodItemNotFoundResponse(
+                            foodItem,
+                            diningHall,
+                            dateObj,
+                            meal
+                        );
+                    }
                 }
 
                 console.log('getDiningHallWithFoodItem: output: ' + output);
@@ -266,7 +272,7 @@ function buildSingleMealMenuResponse (foodItems, diningHall, dateObj, meal) {
     output += diningHallName + ' has ';
 
     // Add each food item to the output.
-    for (var i in foodItems) {
+    for (let i in foodItems) {
         let item = foodItems[i];
         if (i < foodItems.length - 1) {
             output += item + ', ';
@@ -344,6 +350,43 @@ function buildDateObj (req) {
 }
 
 /**
+ * Returns a list of food items from foodItems list that match the
+ * given foodItem. Uses the Fuse.js library to fuzzy match strings.
+ *
+ * @param {string} foodItem - Food item to be searched for.
+ * @param {Array} foodItems - Array of string foodItems to be searched.
+ */
+function getMatchedFoodItems (foodItem, foodItems) {
+    let fuseList = [];
+    let matchedItems = [];
+    let fuseOptions = {
+        shouldSort: true,
+        threshold: 0.3,
+        location: 0,
+        distance: 25,
+        maxPatternLength: 25,
+        minMatchCharLength: 1,
+        keys: ['name']
+    };
+
+    // Build Fuse array to be searched.
+    for (let i in foodItems) {
+        let menuItem = foodItems[i];
+        fuseList.push({name: menuItem});
+    }
+
+    let fuse = new Fuse(fuseList, fuseOptions);
+    let results = fuse.search(foodItem);
+    
+    // Unpack results.
+    for (let i in results) {
+        matchedItems.push(results[i].name);
+    }
+
+    return matchedItems
+}
+
+/**
  * Converts Javascript Date object to a lowercase three-letter abbreviation of
  * the day of the week - 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', or 'sun'.
  *
@@ -401,6 +444,19 @@ function prettifyDiningHallName (string) {
     return diningHallNameMap.get(string);
 }
 
+/**
+ * Returns an array of dining hall names compatible with the ASPC Menu API.
+ */
+function diningHalls() {
+    return ['frary', 'frank', 'cmc', 'scripps', 'pitzer', 'oldenburg'];
+}
+
 /*** LOCAL TESTS ***/
-getSingleMealMenu('frary', new Date(), 'lunch');
-getDiningHallWithFoodItem('chicken', 'frary', new Date(), 'lunch');
+// getSingleMealMenu('frary', new Date(), 'lunch');
+// getDiningHallWithFoodItem('chicken', 'frary', new Date(), 'lunch');
+let foodArray = ["Chocolate Chip Cookie Fried Cheescake","Fried Plantains","Sauteed Kale","Steamed Rice","Black beans","Mojo Chicken"]
+console.log(getMatchedFoodItems('chicken', foodArray));
+
+
+
+
