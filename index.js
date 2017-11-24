@@ -13,6 +13,13 @@ const dayPath = 'day/';
 const mealPath = 'meal/';
 const authTokenPath = 
     '?auth_token=447715aa4a6d9406e9b613f468bc6ccc9f02f20c';
+const diningHalls = [
+    'frary', 
+    'frank', 
+    'cmc', 
+    'scripps', 
+    'pitzer', 
+    'oldenburg'];
 
 /***
  * Dialogflow Webhooks.
@@ -86,15 +93,15 @@ function foodSearch (req, res) {
     let food_item = req.body.result.parameters.food_item;
     let dateObj = buildDateObj(req);
 
-    searchDiningHalls(food_item, dateObj).then((output) => {
+    getFoodItemsThatMatchAtAllDiningHalls(food_item, dateObj).then((output) => {
         // Return output to Dialogflow.
         res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify({'speech': output, 'displayText': output}));
+        res.send(JSON.stringify({'speech': output.join('\n'), 'displayText': output.join('\n')}));
     }).catch((error) => {
         // Log error if there is one.
-        console.log('foodSearch: ERROR: ' + error);
+        console.log('foodSearch: ERROR: ' + error.join('\n'));
         res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify({'speech': error, 'displayText': error}));
+        res.send(JSON.stringify({'speech': error.join('\n'), 'displayText': error.join('\n')}));
     });
 }
 
@@ -159,6 +166,22 @@ function getSingleMealMenu (diningHall, dateObj, meal) {
     });
 }
 
+function getFoodItemsThatMatchAtAllDiningHalls (foodItem, 
+                                                dateObj, 
+                                                meal) {
+    let promises = [];
+    for (let i in diningHalls) {
+        promises.push(
+            getFoodItemsThatMatchAtDiningHall(
+                foodItem, 
+                diningHalls[i], 
+                dateObj, 
+                meal
+            )
+        );
+    }
+    return Promise.all(promises);
+}
 /**
  * Finds all dining halls that are serving food_item for the given day and meal.
  * Makes a call to the ASPC Menu API and constructs Frarold's response.
@@ -364,6 +387,8 @@ function matchFoodItems (foodItem, foodItems) {
     let fuseList = [];
     let matchedItems = [];
     let fuseOptions = {
+        tokenize: true,
+        matchAllTokens: true,
         shouldSort: true,
         threshold: 0.3,
         location: 0,
@@ -466,19 +491,10 @@ function prettifyDiningHallName (string) {
     return diningHallNameMap.get(string);
 }
 
-/**
- * Returns an array of dining hall names compatible with the ASPC Menu API.
- */
-function diningHalls () {
-    return ['frary', 'frank', 'cmc', 'scripps', 'pitzer', 'oldenburg'];
-}
-
 /*** LOCAL TESTS ***/
 // getSingleMealMenu('frary', new Date(), 'lunch');
-getFoodItemsThatMatchAtDiningHall('smores', 'frary', new Date(), 'lunch');
-let foodArray = ["Cinnamon Toast Cereal Bars","Smores Bar","Vegetable Spring Rolls with dipping Sauce","Asian Kale","Stir Fry Veg","Jasmine Rice","Asian Black Pepper Beef"]
-console.log(matchFoodItems('smores', foodArray));
-
-
-
+// getFoodItemsThatMatchAtDiningHall('smores', 'frary', new Date(), 'lunch');
+// let foodArray = ["Cinnamon Toast Cereal Bars","Smores Bar","Vegetable Spring Rolls with dipping Sauce","Asian Kale","Stir Fry Veg","Jasmine Rice","Asian Black Pepper Beef"]
+// console.log(matchFoodItems('smores', foodArray));
+console.log(getFoodItemsThatMatchAtAllDiningHalls('chicken', new Date('11-22-2017'), 'lunch'));
 
