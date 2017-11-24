@@ -96,12 +96,20 @@ function foodSearch (req, res) {
     getFoodItemsThatMatchAtAllDiningHalls(food_item, dateObj).then((output) => {
         // Return output to Dialogflow.
         res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify({'speech': output.join('\n'), 'displayText': output.join('\n')}));
+        res.send(
+            JSON.stringify(
+                {'speech': output.join('\n'), 'displayText': output.join('\n')}
+            )
+        );
     }).catch((error) => {
         // Log error if there is one.
         console.log('foodSearch: ERROR: ' + error.join('\n'));
         res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify({'speech': error.join('\n'), 'displayText': error.join('\n')}));
+        res.send(
+            JSON.stringify(
+                {'speech': error.join('\n'), 'displayText': error.join('\n')}
+            )
+        );
     });
 }
 
@@ -496,5 +504,5 @@ function prettifyDiningHallName (string) {
 // getFoodItemsThatMatchAtDiningHall('smores', 'frary', new Date(), 'lunch');
 // let foodArray = ["Cinnamon Toast Cereal Bars","Smores Bar","Vegetable Spring Rolls with dipping Sauce","Asian Kale","Stir Fry Veg","Jasmine Rice","Asian Black Pepper Beef"]
 // console.log(matchFoodItems('smores', foodArray));
-console.log(getFoodItemsThatMatchAtAllDiningHalls('chicken', new Date('11-22-2017'), 'lunch'));
+// console.log(getFoodItemsThatMatchAtAllDiningHalls('chicken', new Date('11-22-2017'), 'lunch'));
 
