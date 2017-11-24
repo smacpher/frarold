@@ -141,7 +141,7 @@ function getSingleMealMenu (diningHall, dateObj, meal) {
                         meal
                     );
                 } else {
-                    output = buildSingleMealMenuResponse(
+                    output = buildFoodItemsResponse (
                         result.food_items,
                         diningHall, 
                         dateObj, 
@@ -152,8 +152,8 @@ function getSingleMealMenu (diningHall, dateObj, meal) {
                 resolve(output);
             });
 
-        }).on("error", (error) => {
-            console.log("getSingleMealMenu: ERROR: " + error.message);
+        }).on('error', (error) => {
+            console.log('getSingleMealMenu: ERROR: ' + error.message);
             reject(error);
         });
     });
@@ -167,12 +167,12 @@ function getSingleMealMenu (diningHall, dateObj, meal) {
  * @param {Date} dateObj - Built in Javascript Date object; used to match food
  *  item across dining halls for a specific day of the week.
  */
-function getDiningHallWithFoodItem (foodItem, diningHall, dateObj, meal) {
+function getFoodItemsThatMatchAtDiningHall (foodItem, diningHall, dateObj, meal) {
     return new Promise((resolve, reject) => {
         // Get three-letter abbreviation of the date.
         let day = getDayAbbrevFromDateObj(dateObj);
         let path = buildSingleMealMenuHTTPPath(diningHall, day, meal);
-        console.log('getDiningHallWithFoodItem: http get ' + path);
+        console.log('getFoodItemsThatMatchAtDiningHall: http get ' + path);
 
         https.get(path, (resp) => {
 
@@ -181,7 +181,8 @@ function getDiningHallWithFoodItem (foodItem, diningHall, dateObj, meal) {
             resp.on('data', (chunk) => {
                 data += chunk;
                 console.log(
-                    'getDiningHallWithFoodItem: chunk received: ' + chunk
+                    'getFoodItemsThatMatchAtDiningHall: chunk received: ' + 
+                    chunk
                 );
             });
 
@@ -199,14 +200,14 @@ function getDiningHallWithFoodItem (foodItem, diningHall, dateObj, meal) {
                     )
                 } else {
                     // Search through food_items.
-                    let matchedFoodItems = getMatchedFoodItems(
+                    let matchedFoodItems = matchFoodItems(
                         foodItem, 
                         result.food_items
                     );
 
                     // Found an item.
-                    if (matchedFoodItems.length() > 0) {
-                        output = buildFoodItemsFoundResponse(
+                    if (matchedFoodItems.length > 0) {
+                        output = buildFoodItemsResponse (
                             matchedFoodItems,
                             diningHall,
                             dateObj,
@@ -222,12 +223,16 @@ function getDiningHallWithFoodItem (foodItem, diningHall, dateObj, meal) {
                     }
                 }
 
-                console.log('getDiningHallWithFoodItem: output: ' + output);
+                console.log(
+                    'getFoodItemsThatMatchAtDiningHall: output: ' + output
+                );
                 resolve(output);
             });
 
-        }).on("error", (error) => {
-            console.log("getDiningHallWithFoodItem: ERROR: " + error.message);
+        }).on('error', (error) => {
+            console.log(
+                'getFoodItemsThatMatchAtDiningHall: ERROR: ' + error.message
+            );
             reject(error);
         });
     });
@@ -253,7 +258,7 @@ function buildSingleMealMenuHTTPPath (diningHall, day, meal) {
 }
 
 /**
- * Builds the string response for a query for a single dining halls' 
+ * Builds string response for a query for a single dining halls' 
  * menu on a certain day.
  *
  * @param {Array} foodItems - List of food items in menu.
@@ -264,7 +269,7 @@ function buildSingleMealMenuHTTPPath (diningHall, day, meal) {
  * @param {string} meal: Target meal: Valid options are 
  *  'breakfast', 'brunch', 'lunch', and 'dinner'.
  */
-function buildSingleMealMenuResponse (foodItems, diningHall, dateObj, meal) {
+function buildFoodItemsResponse (foodItems, diningHall, dateObj, meal) {
     let output = '';
     let day = prettifyDayName(dateObj);
     let diningHallName = prettifyDiningHallName(diningHall);
@@ -274,18 +279,30 @@ function buildSingleMealMenuResponse (foodItems, diningHall, dateObj, meal) {
     // Add each food item to the output.
     for (let i in foodItems) {
         let item = foodItems[i];
-        if (i < foodItems.length - 1) {
+        if (foodItems.length == 1) {
+            output += item + ' ';
+        } else if (i < foodItems.length - 1) {
             output += item + ', ';
         } else {
             output += 'and ' + item + ' ';
         }
     }
-
     output += 'for ' + meal + ' ' + day + '.';
-
     return output;
 }
 
+/**
+ * Builds string response for when given foodItem is not found at given 
+ * diningHall for the given meal and date.
+ *
+ * @param {string} foodItem - Food item that was not found.
+ * @param {string} diningHall: Target dining hall. Valid options are 
+ *  'frank', 'frary', 'cmc', 'scripps', 'pitzer', and 'oldenburg'.
+ * @param {string} day: Target day of the week. Valid options are 
+ *  'mon', 'tue', 'wed', 'thu', 'fri', 'sat', or 'sun'.
+ * @param {string} meal: Target meal: Valid options are 
+ *  'breakfast', 'brunch', 'lunch', and 'dinner'.
+ */
 function buildFoodItemNotFoundResponse (foodItem, diningHall, dateObj, meal) {
     let output = '';
     let day = prettifyDayName(dateObj);
@@ -293,7 +310,6 @@ function buildFoodItemNotFoundResponse (foodItem, diningHall, dateObj, meal) {
 
     output += diningHallName + ' doesn\'t have ' + foodItem + ' for ' + 
         meal + ' ' + day + '.';
-
     return output;
 }
 
@@ -315,18 +331,6 @@ function buildNoMealDataResponse (diningHall, dateObj, meal) {
         ' didn\'t post ' + meal + ' ' + day + '.';
 
     return noMealDataOutput;
-}
-
-function prettifyDayName (dateObj) {
-    // Initialize outputDay to day of the week.
-    let day = getDayFromDateObj(dateObj);
-
-    // If dateObj is today, use "today" instead.
-    if (new Date().getDay() == dateObj.getDay()) {
-        day = 'today';
-    }
-
-    return day;
 }
 
 /**
@@ -356,7 +360,7 @@ function buildDateObj (req) {
  * @param {string} foodItem - Food item to be searched for.
  * @param {Array} foodItems - Array of string foodItems to be searched.
  */
-function getMatchedFoodItems (foodItem, foodItems) {
+function matchFoodItems (foodItem, foodItems) {
     let fuseList = [];
     let matchedItems = [];
     let fuseOptions = {
@@ -427,6 +431,24 @@ function getDayFromDateObj (dateObj) {
 }
 
 /**
+ * Converts Javascript Date object into pretty name. If dateObj is today,
+ * then uses 'today' rather than day of the week name.
+ *
+ * @param {Date} dateObj - Date object to convert.
+ */
+function prettifyDayName (dateObj) {
+    // Initialize outputDay to day of the week.
+    let day = getDayFromDateObj(dateObj);
+
+    // If dateObj is today, use "today" instead.
+    if (new Date().getDay() == dateObj.getDay()) {
+        day = 'today';
+    }
+
+    return day;
+}
+
+/**
  * Converts Dialogflow Agent dining_hall entity names to prettier names.
  *
  * @param {String} string - Dining hall to be converted. Valid options are
@@ -447,15 +469,15 @@ function prettifyDiningHallName (string) {
 /**
  * Returns an array of dining hall names compatible with the ASPC Menu API.
  */
-function diningHalls() {
+function diningHalls () {
     return ['frary', 'frank', 'cmc', 'scripps', 'pitzer', 'oldenburg'];
 }
 
 /*** LOCAL TESTS ***/
 // getSingleMealMenu('frary', new Date(), 'lunch');
-// getDiningHallWithFoodItem('chicken', 'frary', new Date(), 'lunch');
-let foodArray = ["Chocolate Chip Cookie Fried Cheescake","Fried Plantains","Sauteed Kale","Steamed Rice","Black beans","Mojo Chicken"]
-console.log(getMatchedFoodItems('chicken', foodArray));
+getFoodItemsThatMatchAtDiningHall('smores', 'frary', new Date(), 'lunch');
+let foodArray = ["Cinnamon Toast Cereal Bars","Smores Bar","Vegetable Spring Rolls with dipping Sauce","Asian Kale","Stir Fry Veg","Jasmine Rice","Asian Black Pepper Beef"]
+console.log(matchFoodItems('smores', foodArray));
 
 
 
