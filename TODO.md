@@ -5,5 +5,6 @@ but refer to the same dining hall (any combination of entities)
 it work whether or not user defines meal. if user doesnt define meal, then
 fetch dining halls and report for which meals they have the match.
 - Add dining hall hours.
+- Bug: Need to fix date offset thing.
 - Low Priority: Figure out how to use threading to show loading animation.
 
