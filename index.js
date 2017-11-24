@@ -91,9 +91,12 @@ function foodList (req, res) {
  */
 function foodSearch (req, res) {
     let food_item = req.body.result.parameters.food_item;
+    let meal = req.body.result.parameters.meal;
     let dateObj = buildDateObj(req);
 
-    getFoodItemsThatMatchAtAllDiningHalls(food_item, dateObj).then((output) => {
+    getFoodItemsThatMatchAtAllDiningHalls(food_item, 
+                                          dateObj, 
+                                          meal).then((output) => {
         // Return output to Dialogflow.
         res.setHeader('Content-Type', 'application/json');
         res.send(
@@ -174,6 +177,15 @@ function getSingleMealMenu (diningHall, dateObj, meal) {
     });
 }
 
+/**
+ * Finds all dining halls that are serving foodItem for the given day and meal.
+ * Makes a call to the ASPC Menu API and constructs Frarold's response. Fuzzy
+ * string matches foodItem to menu items.
+ *
+ * @param {string} foodItem - Food item to search for.
+ * @param {Date} dateObj - Built in Javascript Date object; used to match food
+ *  item across dining halls for a specific day of the week.
+ */
 function getFoodItemsThatMatchAtAllDiningHalls (foodItem, 
                                                 dateObj, 
                                                 meal) {
@@ -190,11 +202,13 @@ function getFoodItemsThatMatchAtAllDiningHalls (foodItem,
     }
     return Promise.all(promises);
 }
+
 /**
- * Finds all dining halls that are serving food_item for the given day and meal.
+ * Finds all menu items that are similar to given foodItem through fuzzy string
+ * matching for the given day and meal.
  * Makes a call to the ASPC Menu API and constructs Frarold's response.
  *
- * @param {string} food_item - Food item to search for.
+ * @param {string} foodItem - Food item to search for.
  * @param {Date} dateObj - Built in Javascript Date object; used to match food
  *  item across dining halls for a specific day of the week.
  */

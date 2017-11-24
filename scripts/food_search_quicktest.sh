@@ -4,7 +4,8 @@ gcloud beta functions call fraroldWebhook \
     "result": {
         "parameters": {
             "food_item": "chicken",
-            "meal": "lunch"
+            "meal": "lunch",
+            "date": "2017-11-21"
         },
         "metadata": {
             "intentName": "food_search"
