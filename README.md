@@ -22,6 +22,7 @@ _Examples_:
 - "What's oldy having for lunch today?"
 - "Pitzer dinner?" (Frarold will assume you want to know about today's meals
 if no meal is specified)
+- "Who is serving chicken for lunch today?"
 
 ## Dependencies
 To use the Python CLI Client, you will need to install the
