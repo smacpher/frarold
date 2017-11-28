@@ -19,7 +19,8 @@ const diningHalls = [
     'cmc', 
     'scripps', 
     'pitzer', 
-    'oldenburg'];
+    'oldenburg'
+];
 
 /***
  * Dialogflow Webhooks.
