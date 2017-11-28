@@ -21,6 +21,18 @@ const diningHalls = [
     'pitzer', 
     'oldenburg'
 ];
+const fuseOptions = {
+    tokenize: true,
+    tokenSeparator: ' ',
+    matchAllTokens: true,
+    shouldSort: true,
+    threshold: 0.2,
+    location: 0,
+    distance: 25,
+    maxPatternLength: 25,
+    minMatchCharLength: 1,
+    keys: ['name']
+};
 
 /***
  * Dialogflow Webhooks.
@@ -409,32 +421,30 @@ function buildDateObj (req) {
 function matchFoodItems (foodItem, foodItems) {
     let fuseList = [];
     let matchedItems = [];
-    let fuseOptions = {
-        tokenize: true,
-        matchAllTokens: true,
-        shouldSort: true,
-        threshold: 0.2,
-        location: 0,
-        distance: 25,
-        maxPatternLength: 25,
-        minMatchCharLength: 1,
-        keys: ['name']
-    };
 
     // Build Fuse array to be searched.
     for (let i in foodItems) {
         let menuItem = foodItems[i];
-        fuseList.push({name: menuItem});
+        fuseList.push({'name': JSON.stringify(menuItem)});
+    }
+    console.log("DEBUG FUSE LIST: " + fuseList);
+    let fuse = new Fuse(fuseList, fuseOptions);
+    let results;
+
+    try {
+        results = fuse.search(foodItem);
+    } catch (error) {
+        console.log("matchFoodItems: error: " + error);
+        results = ' ';
     }
 
-    let fuse = new Fuse(fuseList, fuseOptions);
-    let results = fuse.search(foodItem);
-    
+    console.log("DEBUG RESULTS: " + results);
+
     // Unpack results.
     for (let i in results) {
         matchedItems.push(results[i].name);
     }
-
+    console.log("DEBUG MATCHEDITEMS: " + matchedItems);
     return matchedItems
 }
 
@@ -519,5 +529,5 @@ function prettifyDiningHallName (string) {
 // getFoodItemsThatMatchAtDiningHall('smores', 'frary', new Date(), 'lunch');
 // let foodArray = ["Cinnamon Toast Cereal Bars","Smores Bar","Vegetable Spring Rolls with dipping Sauce","Asian Kale","Stir Fry Veg","Jasmine Rice","Asian Black Pepper Beef"]
 // console.log(matchFoodItems('smores', foodArray));
-// console.log(getFoodItemsThatMatchAtAllDiningHalls('chicken', new Date('11-22-2017'), 'lunch'));
+console.log(getFoodItemsThatMatchAtAllDiningHalls('chicken', new Date(), 'lunch'));
 
