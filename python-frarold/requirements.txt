@@ -1,0 +1,1 @@
+git+https://github.com/smacpher/dialogflow-python-client.git@master#egg=dialogflow-python
