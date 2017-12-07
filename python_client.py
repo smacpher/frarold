@@ -39,6 +39,9 @@ def main():
         sys.stdout.write('You: ')
         userInput = raw_input()
 
+        if userInput == '':
+            continue
+
         # Check to see if user wants to exit.
         if isExitCmd(userInput):
             break
