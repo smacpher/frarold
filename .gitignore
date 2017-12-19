@@ -1,4 +1,5 @@
 node_modules
+out
 python-frarold/build
 python-frarold/dist
 python-frarold/python_frarold.egg-info
