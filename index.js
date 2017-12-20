@@ -79,9 +79,9 @@ function foodList (req, res) {
     // Both diningHall and meal are required parameters.
     let diningHall = req.body.result.parameters.dining_hall;
     let meal = req.body.result.parameters.meal;
-    let dateObj = buildMoment(req);
+    let date = buildMoment(req.body.result.parameters.date);
 
-    getSingleMealMenu(diningHall, dateObj, meal).then((output) => {
+    getSingleMealMenu(diningHall, date, meal).then((output) => {
         // Return output to Dialogflow.
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify({'speech': output, 'displayText': output}));
@@ -108,10 +108,10 @@ function foodList (req, res) {
 function foodSearch (req, res) {
     let food_item = req.body.result.parameters.food_item;
     let meal = req.body.result.parameters.meal;
-    let dateObj = buildMoment(req);
+    let date = buildMoment(req);
 
     getFoodItemsThatMatchAtAllDiningHalls(food_item, 
-                                          dateObj, 
+                                          date, 
                                           meal).then((output) => {
         // Return output to Dialogflow.
         res.setHeader('Content-Type', 'application/json');
@@ -140,7 +140,7 @@ function foodSearch (req, res) {
  * 
  * @param {string} diningHall - Valid options are 'frank', 'frary', 'cmc', 
  *  'scripps', 'pitzer', and 'oldenburg'.
- * @param {Date} dateObj - Built in Javascript Date object; used to fetch meal
+ * @param {moment} date - Javascript moment object; used to fetch meal
  *  for a specific day of the week.
  * @param {string} meal - Valid options are 'breakfast', 'brunch', 'lunch', and
  *  'dinner'.
@@ -148,7 +148,6 @@ function foodSearch (req, res) {
 function getSingleMealMenu (diningHall, date, meal) {
     return new Promise((resolve, reject) => {
         // Get three-letter abbreviation of the date.
-        console.log("DATE: " + date)
         let dayAbbrev = getDayAbbrev(date);
         let path = buildSingleMealMenuHTTPPath(diningHall, dayAbbrev, meal);
         console.log('getSingleMealMenu: http get ' + path);
@@ -200,11 +199,11 @@ function getSingleMealMenu (diningHall, date, meal) {
  * string matches foodItem to menu items.
  *
  * @param {string} foodItem - Food item to search for.
- * @param {Date} dateObj - Built in Javascript Date object; used to match food
+ * @param {moment} date - Javascript moment object; used to match food
  *  item across dining halls for a specific day of the week.
  */
 function getFoodItemsThatMatchAtAllDiningHalls (foodItem, 
-                                                dateObj, 
+                                                date, 
                                                 meal) {
     let promises = [];
     for (let i in diningHalls) {
@@ -212,7 +211,7 @@ function getFoodItemsThatMatchAtAllDiningHalls (foodItem,
             getFoodItemsThatMatchAtDiningHall(
                 foodItem, 
                 diningHalls[i], 
-                dateObj, 
+                date, 
                 meal
             )
         );
@@ -226,13 +225,13 @@ function getFoodItemsThatMatchAtAllDiningHalls (foodItem,
  * Makes a call to the ASPC Menu API and constructs Frarold's response.
  *
  * @param {string} foodItem - Food item to search for.
- * @param {Date} dateObj - Built in Javascript Date object; used to match food
+ * @param {moment} date - Javascript moment object; used to match food
  *  item across dining halls for a specific day of the week.
  */
-function getFoodItemsThatMatchAtDiningHall (foodItem, diningHall, dateObj, meal) {
+function getFoodItemsThatMatchAtDiningHall (foodItem, diningHall, date, meal) {
     return new Promise((resolve, reject) => {
         // Get three-letter abbreviation of the date.
-        let day = getDayAbbrev(dateObj);
+        let day = getDayAbbrev(date);
         let path = buildSingleMealMenuHTTPPath(diningHall, day, meal);
         console.log('getFoodItemsThatMatchAtDiningHall: http get ' + path);
 
@@ -257,7 +256,7 @@ function getFoodItemsThatMatchAtDiningHall (foodItem, diningHall, dateObj, meal)
                 if (!result) {
                     output = buildNoMealDataResponse(
                         diningHall,
-                        dateObj,
+                        date,
                         meal
                     )
                 } else {
@@ -272,14 +271,14 @@ function getFoodItemsThatMatchAtDiningHall (foodItem, diningHall, dateObj, meal)
                         output = buildFoodItemsResponse (
                             matchedFoodItems,
                             diningHall,
-                            dateObj,
+                            date,
                             meal
                         )
                     } else {
                         output = buildFoodItemNotFoundResponse(
                             foodItem,
                             diningHall,
-                            dateObj,
+                            date,
                             meal
                         );
                     }
@@ -331,9 +330,9 @@ function buildSingleMealMenuHTTPPath (diningHall, day, meal) {
  * @param {string} meal: Target meal: Valid options are 
  *  'breakfast', 'brunch', 'lunch', and 'dinner'.
  */
-function buildFoodItemsResponse (foodItems, diningHall, dateObj, meal) {
+function buildFoodItemsResponse (foodItems, diningHall, date, meal) {
     let output = '';
-    let day = prettifyDayName(dateObj);
+    let day = prettifyDayName(date);
     let diningHallName = prettifyDiningHallName(diningHall);
 
     output += diningHallName + ' has ';
@@ -365,9 +364,9 @@ function buildFoodItemsResponse (foodItems, diningHall, dateObj, meal) {
  * @param {string} meal: Target meal: Valid options are 
  *  'breakfast', 'brunch', 'lunch', and 'dinner'.
  */
-function buildFoodItemNotFoundResponse (foodItem, diningHall, dateObj, meal) {
+function buildFoodItemNotFoundResponse (foodItem, diningHall, date, meal) {
     let output = '';
-    let day = prettifyDayName(dateObj);
+    let day = prettifyDayName(date);
     let diningHallName = prettifyDiningHallName(diningHall);
 
     output += diningHallName + ' doesn\'t have ' + foodItem + ' for ' + 
@@ -380,7 +379,7 @@ function buildFoodItemNotFoundResponse (foodItem, diningHall, dateObj, meal) {
  *
  * @param {string} diningHall - Valid options are 'frank', 'frary', 'cmc', 
  *  'scripps', 'pitzer', and 'oldenburg'.
- * @param {Date} dateObj - Built in Javascript Date object; used to fetch meal
+ * @param {moment} date - Javascript moment object; used to fetch meal
  *  for a specific day of the week.
  * @param {string} meal - Valid options are 'breakfast', 'brunch', 'lunch', and
  *  'dinner'.
@@ -403,16 +402,16 @@ function buildNoMealDataResponse (diningHall, date, meal) {
  *  req.body.result.parameters.date specified 
  *  (since the date entity is optional).
  */
-function buildMoment (req) {
+function buildMoment (requestDate) {
     // Initialize to today's date.
-    let date = new moment().tz(timezone).format(dialogflowDateFormat);
+    let date = new moment();
+    console.log('REQUEST DATE: ' + requestDate);
+    console.log('DEFAULT MOMENT: ' + date);
 
     // Date is an optional parameter. If present, update to reflect date in req.
-    if (req.body.result.parameters.date) {
-        date = new moment(
-            req.body.result.parameters.date, 
-            dialogflowDateFormat
-        ).tz(timezone).format(dialogflowDateFormat);
+    if (requestDate) {
+        date = new moment(requestDate, dialogflowDateFormat)
+        console.log('UPDATED MOMENT: ' + date)
     }
 
     return date;
@@ -456,26 +455,26 @@ function matchFoodItems (foodItem, foodItems) {
 }
 
 /**
- * Converts Javascript Date object to a lowercase three-letter abbreviation of
+ * Converts Javascript moment object to a lowercase three-letter abbreviation of
  * the day of the week - 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', or 'sun'.
  *
- * @param {Date} - Built in Javascript Date object from which day of the week
+ * @param {momilt in Javascript moment object from which day of the week
  *  will be extracted.
  */
 function getDayAbbrev (date) {
     // Parse out three-letter abbreviation of day.
-    return date.format('ddd').toLowerCase();
+    return date.tz(timezone).format('ddd').toLowerCase();
 }
 
 /**
- * Converts Javascript Date object into pretty name. If dateObj is today,
+ * Converts Javascript moment object into pretty name. If date is today,
  * then uses 'today' rather than day of the week name.
  *
- * @param {Date} dateObj - Date object to convert.
+ * @param {moment} date - Moment object to convert.
  */
 function prettifyDayName (date) {
     // Initialize outputDay to day of the week.
-    let day = date.format('dddd')
+    let day = date.tz(timezone).format('dddd');
     return day;
 }
 
@@ -497,9 +496,11 @@ function prettifyDiningHallName (string) {
     return diningHallNameMap.get(string);
 }
 
-let req = `
-
-`
-
-console.log(buildMoment(req));
 /*** LOCAL TESTS ***/
+// let date = buildMoment('2017-12-19');
+// let abb = getDayAbbrev(date);
+// let pretty = prettifyDayName(date);
+// console.log(date);
+// console.log(abb);
+// console.log(pretty);
+
