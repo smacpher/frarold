@@ -2,7 +2,8 @@
 Ask me about food at the 5C's.
 
 ## Talk to me!
-So far, you can only talk to me through the command line.
+So far, you can only talk to me through the command line or through a beta
+website provided by Dialogflow: https://bot.dialogflow.com/de1a8ac2-6762-4d5f-ad6b-d4d87a612eef
 
 First, take a look at the Dependencies section below to install
 everything that helps me run properly.

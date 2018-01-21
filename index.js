@@ -404,14 +404,14 @@ function buildNoMealDataResponse (diningHall, date, meal) {
  */
 function buildMoment (requestDate) {
     // Initialize to today's date.
-    let date = new moment();
+    let date = new moment().tz(timezone);
     console.log('REQUEST DATE: ' + requestDate);
     console.log('DEFAULT MOMENT: ' + date);
 
     // Date is an optional parameter. If present, update to reflect date in req.
     if (requestDate) {
-        date = new moment(requestDate, dialogflowDateFormat)
-        console.log('UPDATED MOMENT: ' + date)
+        date = new moment(requestDate, dialogflowDateFormat).tz(timezone);
+        console.log('UPDATED MOMENT: ' + date);
     }
 
     return date;
